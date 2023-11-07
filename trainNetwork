@@ -1,0 +1,78 @@
+/// Sample: graph ///////////////////////////////////////////////
+const Graph = require('./Graph.js');
+const Vertex = require('./Vertex.js');
+// add Vertex to the graph with .addVertex() method.
+const addStation = (station, trainLine) => trainLine.addVertex(station);
+// add edge's and weight's to vertices with .addEdge() method.
+const link = (station1, station2, trainLine, distance) => trainLine.addEdge(station1, station2, distance);
+// remove Vertex from the graph with .removeVertex() method.
+const removeStation = (station, trainLine) => trainLine.removeVertex(station);
+// remove edge's from vertices with .removeEdge() method.
+const disconnect = (station1, station2, trainLine) => trainLine.removeEdge(station1, station2);
+
+/// Sample: bi-directional/weighted network graph /////////////////////////////////////// 
+const trainNetwork = new Graph(false, true);
+
+const brisbaneCentral = addStation('Brisbane Central', trainNetwork);
+const fortitudeValley = addStation('Fortitude Valley', trainNetwork);
+link(brisbaneCentral, fortitudeValley, trainNetwork, '4 minutes');
+
+const bowenHills = addStation('Bowen Hills', trainNetwork);
+link(fortitudeValley, bowenHills, trainNetwork, '7 minutes');
+
+const albion = addStation('Albion', trainNetwork);
+link(bowenHills, albion, trainNetwork, '8 minutes');
+
+const wooloowin = addStation('Wooloowin', trainNetwork);
+link(albion, wooloowin, trainNetwork, '2 minutes');
+
+const eagleJunction = addStation('Eagle Junction', trainNetwork);
+link(wooloowin, eagleJunction, trainNetwork, '3 minutes'); 
+
+const clayField = addStation('Clayfield', trainNetwork);
+link(eagleJunction, clayField, trainNetwork, '3 minutes');
+
+const hendra = addStation('Hendra', trainNetwork);
+link(clayField, hendra, trainNetwork, '2 minutes');
+
+const ascot = addStation('Ascot', trainNetwork);
+link(hendra, ascot, trainNetwork, '3 minutes');
+
+const doomben = addStation('Doomben', trainNetwork);
+link(ascot, doomben, trainNetwork, '3 minutes')
+console.log('\n//// Bi-directional/Weighted Network ////')
+trainNetwork.print()
+
+/// Sample: bi-directional/Cycle network ///////////////////////////////////
+const cycleNetwork = new Graph(false, true)
+cycleNetwork.vertices = trainNetwork.vertices.filter(vertex => vertex === brisbaneCentral || vertex === fortitudeValley) 
+const exhibition = addStation('Exhibition', cycleNetwork);
+link(fortitudeValley, exhibition, cycleNetwork, '?')
+
+const romaStreet = addStation('Roma Street', cycleNetwork);
+link(exhibition, romaStreet, cycleNetwork, '?');
+link(romaStreet, brisbaneCentral, cycleNetwork, '4 minutes');
+
+console.log('\n//// Network Cycle ////')
+cycleNetwork.print()
+
+/// Sample: directed network one way Roma Street to Sydney ///////////////////////////////////
+const directedNetwork = new Graph(true, true)
+directedNetwork.vertices = cycleNetwork.vertices.filter(vertex => vertex === romaStreet);
+const sydney = addStation('Sydney', directedNetwork);
+link(romaStreet, sydney, directedNetwork, '1 day');
+
+console.log('\n//// directed Network one way from Roma Street to Sydney ////')
+directedNetwork.print()
+
+/// Sample: remove Edge and vertex from network ///////////////////////////////////
+console.log('\n//// Current directed Network ////', directedNetwork);
+disconnect(romaStreet, sydney, directedNetwork);
+removeStation(romaStreet, directedNetwork);
+removeStation(sydney, directedNetwork);
+
+console.log(`\n//// Roma Street and sydney have been removed from network`);
+console.log('Vertices removed from directed', directedNetwork)
+
+
+
